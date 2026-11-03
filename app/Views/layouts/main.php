@@ -1,15 +1,54 @@
+<?php
+$rawUriString = function_exists('uri_string') ? uri_string() : '';
+$uriParts = explode('/', trim($rawUriString, '/'));
+$seg1 = strtolower($uriParts[0] ?? 'dashboard');
+if (empty($seg1) || in_array($seg1, ['lenden', 'public'])) {
+    $uri = service('uri');
+    $segments = $uri->getSegments();
+    foreach ($segments as $s) {
+        $ls = strtolower($s);
+        if (!in_array($ls, ['lenden', 'public'])) {
+            $seg1 = $ls;
+            break;
+        }
+    }
+}
+$seg2 = strtolower($uriParts[1] ?? '');
+
+// Super Admin & Sensitive management areas strictly excluded from SEO indexing and demo auto-login
+$isSuperAdminArea = in_array($seg1, ['subscriptions', 'subscription', 'users', 'roles', 'settings', 'payments', 'profile'], true)
+    || ($seg1 === 'admin' && in_array($seg2, ['users', 'roles', 'subscriptions'], true));
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= esc($title ?? 'LenDen Cloud') ?> — Cloud Accounting &amp; ERP</title>
-    <!-- Safeguard private financial and authenticated ERP records from search indexing -->
-    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-    <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
-    <meta name="theme-color" content="#2563eb">
-    <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico') ?>">
-    <link rel="apple-touch-icon" href="<?= base_url('assets/images/apple-touch-icon.png') ?>">
+
+    <!-- Google Analytics (gtag.js) -->
+    <?= google_analytics() ?>
+
+    <!-- Google Search Console Verification -->
+    <?= google_search_console() ?>
+
+    <?php if ($isSuperAdminArea): ?>
+        <!-- Strictly protected Super Admin area -->
+        <title><?= esc($title ?? 'Super Admin') ?> — LenDen Cloud</title>
+        <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+        <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
+        <meta name="theme-color" content="#2563eb">
+        <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico') ?>">
+        <link rel="apple-touch-icon" href="<?= base_url('assets/images/apple-touch-icon.png') ?>">
+    <?php else: ?>
+        <!-- Live Demo ERP Module SEO Meta Tags & Open Graph -->
+        <?= seo_meta([
+            'title'     => $title ?? 'Accounting Suite',
+            'canonical' => seo_canonical_url(),
+            'robots'    => 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+            'og_type'   => 'website',
+        ]) ?>
+    <?php endif; ?>
+
     <meta name="csrf-token" content="<?= csrf_hash() ?>">
     <meta name="currency-symbol" content="<?= esc($currency_symbol ?? '₹') ?>">
     <meta name="base-url" content="<?= rtrim(base_url(), '/') ?>">
@@ -431,10 +470,15 @@
                 <div class="d-flex align-items-center gap-2">
                     <i class="bi bi-exclamation-triangle fs-5 text-warning"></i>
                     <div class="small">
-                        <strong>Demo Login Mode:</strong> You are browsing with a demonstration account. Data changes (add, edit, delete) are disabled and cannot be saved.
+                        <strong>Demo Login Mode:</strong> You are browsing live LenDen Cloud modules with demonstration data. Changes are not saved.
                     </div>
                 </div>
-                <span class="badge bg-warning text-dark px-2 py-1 fw-bold" style="font-size: 0.72rem;">Read-Only Demo</span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark px-2 py-1 fw-bold" style="font-size: 0.72rem;">Read-Only Demo</span>
+                    <a href="<?= base_url('subscribe') ?>" class="btn btn-sm btn-primary py-1 px-3 fw-semibold" style="font-size: 0.75rem;">
+                        <i class="bi bi-rocket-takeoff me-1"></i> Start 30-Day Free Trial
+                    </a>
+                </div>
             </div>
         <?php endif; ?>
         <?= $this->include('partials/flash_messages') ?>
@@ -444,7 +488,7 @@
     <!-- App Footer -->
     <footer class="app-footer text-muted small border-top bg-white px-4 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div>
-            &copy; <?= date('Y') ?> <strong><?= esc($company_name ?? 'LenDen Enterprise') ?></strong> &bull; Double-Entry Accounting &amp; Business Management ERP
+            &copy; <?= date('Y') ?> <strong><?= esc($company_name ?? 'LenDen Cloud') ?></strong> &bull; Cloud Accounting &amp; Multi-Company ERP
         </div>
         <div class="d-flex align-items-center gap-3">
             <span>Fiscal Year: <?= date('Y') ?>-<?= date('y') + 1 ?></span>

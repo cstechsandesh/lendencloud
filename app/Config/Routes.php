@@ -15,6 +15,7 @@ $routes->get('pricing', 'Home::pricing');
 $routes->get('faq', 'Home::faq');
 $routes->get('sitemap.xml', 'SeoController::sitemap');
 $routes->get('robots.txt', 'SeoController::robots');
+$routes->get('(google[a-zA-Z0-9_-]+\.html)', 'SeoController::googleVerification/$1');
 
 $routes->get('login', 'Auth\AuthController::login');
 $routes->post('login', 'Auth\AuthController::attemptLogin');

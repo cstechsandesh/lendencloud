@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, follow">
+    <?= function_exists('google_search_console') ? google_search_console() : '' ?>
     <title><?= lang('Errors.pageNotFound') ?> — LenDen Cloud</title>
 
     <style>

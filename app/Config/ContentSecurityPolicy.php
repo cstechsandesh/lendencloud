@@ -73,6 +73,7 @@ class ContentSecurityPolicy extends BaseConfig
         'https://cdn.jsdelivr.net',
         'https://code.jquery.com',
         'https://cdn.datatables.net',
+        'https://www.googletagmanager.com',
     ];
 
     /**
@@ -86,6 +87,7 @@ class ContentSecurityPolicy extends BaseConfig
         'https://cdn.jsdelivr.net',
         'https://code.jquery.com',
         'https://cdn.datatables.net',
+        'https://www.googletagmanager.com',
     ];
 
     /**
@@ -172,6 +174,10 @@ class ContentSecurityPolicy extends BaseConfig
     public $connectSrc = [
         'self',
         'https://cdn.jsdelivr.net',
+        'https://www.googletagmanager.com',
+        'https://*.google-analytics.com',
+        'https://www.google-analytics.com',
+        'https://stats.g.doubleclick.net',
     ];
 
     /**

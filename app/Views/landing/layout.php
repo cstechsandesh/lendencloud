@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="base-url" content="<?= rtrim(base_url(), '/') ?>">
 
+    <!-- Google Analytics (gtag.js) -->
+    <?= google_analytics() ?>
+
+    <!-- Google Search Console Verification -->
+    <?= google_search_console() ?>
+
     <!-- Comprehensive SEO Meta Tags, Canonical, Open Graph, Twitter & PWA Tags -->
     <?= seo_meta(array_merge($seo ?? [], !empty($title) ? ['title' => $title] : [])) ?>
 

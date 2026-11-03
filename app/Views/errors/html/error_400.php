@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title><?= lang('Errors.badRequest') ?></title>
+    <?= function_exists('google_search_console') ? google_search_console() : '' ?>
 
     <style>
         div.logo {

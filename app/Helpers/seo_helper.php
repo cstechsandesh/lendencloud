@@ -49,9 +49,44 @@ if (!function_exists('seo_meta')) {
             $metaTitle = esc($rawTitle ?: $cfg->defaultTitle);
         }
 
+        // Resolve Module-specific default description & keywords if not explicitly supplied
+        $uri = service('uri');
+        $segments = $uri->getSegments();
+        $moduleKey = strtolower($segments[0] ?? '');
+        $subKey    = strtolower($segments[1] ?? '');
+
+        $moduleDescriptions = [
+            'dashboard'  => 'Live accounting & business dashboard: real-time profit & loss, cash balances, sales velocity, customer receivables, and vendor payables in LenDen Cloud ERP.',
+            'accounts'   => 'Double-entry Chart of Accounts, debit & credit general ledgers, trial balance reconciliation, and group hierarchies in LenDen Cloud ERP.',
+            'journals'   => 'Double-entry journal vouchers with mathematical debit/credit balance validation in LenDen Cloud ERP.',
+            'parties'    => 'Customer and supplier master directories, GSTIN registration status, ledger statements, and contact profiles in LenDen Cloud ERP.',
+            'inventory'  => 'Multi-warehouse inventory catalog, SKU tracking, reorder levels, stock adjustments, and stock valuation in LenDen Cloud ERP.',
+            'sales'      => 'GST-compliant sales tax invoices (CGST, SGST, IGST), quotations, sales order lifecycle, and customer payments in LenDen Cloud ERP.',
+            'purchases'  => 'Vendor procurement orders, input tax credit (ITC) purchase bills, and accounts payable management in LenDen Cloud ERP.',
+            'vouchers'   => 'Double-entry cash & bank payment vouchers, customer receipt vouchers, and contra vouchers in LenDen Cloud ERP.',
+            'reports'    => 'Financial audit statements: real-time Balance Sheet, Profit & Loss, Trial Balance, Stock Ledger, and Day Book in LenDen Cloud ERP.',
+            'companies'  => 'Multi-company portfolio management: 1-click workspace switcher, subsidiary ledgers, and branch governance in LenDen Cloud ERP.',
+        ];
+
+        $moduleKeywords = [
+            'dashboard'  => 'accounting dashboard, business metrics, financial KPIs, cloud ERP, cash flow tracking',
+            'accounts'   => 'chart of accounts, general ledger, double entry ledgers, debit credit accounting, trial balance',
+            'journals'   => 'journal voucher, journal entry, double entry bookkeeping, accounting adjustment',
+            'parties'    => 'customer directory, vendor master, party ledger, GST accounts receivable',
+            'inventory'  => 'warehouse inventory, stock management, stock adjustments, inventory valuation, SKU tracking',
+            'sales'      => 'GST invoice, sales order, tax invoice generator, CGST SGST IGST, billing software',
+            'purchases'  => 'purchase bills, vendor bills, procurement ERP, accounts payable, input tax credit',
+            'vouchers'   => 'payment voucher, receipt voucher, contra voucher, bank cash voucher',
+            'reports'    => 'balance sheet, profit and loss, trial balance, stock report, day book, financial statements',
+            'companies'  => 'multi company ERP, branch management, holding subsidiaries, conglomerate accounting',
+        ];
+
+        $fallbackDesc = $moduleDescriptions[$moduleKey] ?? $cfg->defaultDescription;
+        $fallbackKeywords = $moduleKeywords[$moduleKey] ?? $cfg->defaultKeywords;
+
         // Meta Description & Keywords
-        $metaDescription = esc(trim($custom['description'] ?? $custom['meta_description'] ?? $cfg->defaultDescription));
-        $metaKeywords = esc(trim($custom['keywords'] ?? $custom['meta_keywords'] ?? $cfg->defaultKeywords));
+        $metaDescription = esc(trim($custom['description'] ?? $custom['meta_description'] ?? $fallbackDesc));
+        $metaKeywords = esc(trim($custom['keywords'] ?? $custom['meta_keywords'] ?? $fallbackKeywords));
         $author = esc($custom['author'] ?? $cfg->author);
 
         // Canonical & Robots
@@ -83,6 +118,19 @@ if (!function_exists('seo_meta')) {
         $html[] = '<meta name="robots" content="' . esc($robots) . '">';
         $html[] = '<meta name="googlebot" content="' . esc($robots) . '">';
         $html[] = '<link rel="canonical" href="' . esc($canonical) . '">';
+
+        // Google Search Console Verification (injected if configured and not already rendered)
+        $gscTag = google_search_console([
+            'token'   => $custom['google_site_verification'] ?? $custom['google_search_console'] ?? null,
+            'enabled' => $custom['google_search_console_enabled'] ?? null,
+        ]);
+        if (!empty($gscTag)) {
+            foreach (explode("\n", trim($gscTag)) as $line) {
+                if (trim($line) !== '') {
+                    $html[] = trim($line);
+                }
+            }
+        }
 
         $html[] = '';
         $html[] = '<!-- Open Graph / Facebook / LinkedIn / WhatsApp -->';
@@ -369,4 +417,188 @@ if (!function_exists('seo_breadcrumbs_html')) {
         return implode("\n", $html);
     }
 }
+
+if (!function_exists('analytics_config')) {
+    /**
+     * Get instance of Analytics configuration
+     */
+    function analytics_config(): \Config\Analytics {
+        static $cfg = null;
+        if ($cfg === null) {
+            $cfg = config('Analytics') ?? new \Config\Analytics();
+        }
+        return $cfg;
+    }
+}
+
+if (!function_exists('google_analytics')) {
+    /**
+     * Render Google Analytics gtag.js script snippet
+     *
+     * Injected for all users (guests, prospects, demo users, tenant admins, accountants, staff)
+     * EXCEPT Super Administrators (to keep developer/audit/management traffic out of production metrics).
+     * Configurable in .env via GOOGLE_ANALYTICS_ID and GOOGLE_ANALYTICS_ENABLED.
+     *
+     * @param array $customOptions Optional overrides (id, exclude_super_admin, anonymize_ip, force, reset)
+     * @return string Rendered HTML script tag or empty string
+     */
+    function google_analytics(array $customOptions = []): string {
+        static $alreadyRendered = false;
+
+        if (!empty($customOptions['reset'])) {
+            $alreadyRendered = false;
+            return '';
+        }
+
+        $force = (bool)($customOptions['force'] ?? false);
+        if ($alreadyRendered && !$force) {
+            return '';
+        }
+
+        $cfg = analytics_config();
+
+        // 1. Verify tracking is enabled
+        if (!$cfg->enabled) {
+            return '';
+        }
+
+        // 2. Resolve Measurement ID
+        $measurementId = trim((string)($customOptions['id'] ?? $cfg->googleAnalyticsId));
+        if (empty($measurementId)) {
+            return '';
+        }
+
+        // 3. Exclude Super Administrator if configured
+        $excludeSuper = (bool)($customOptions['exclude_super_admin'] ?? $cfg->excludeSuperAdmin);
+        if ($excludeSuper) {
+            $isSuper = false;
+            if (function_exists('is_super_admin')) {
+                $isSuper = is_super_admin();
+            } elseif (function_exists('session')) {
+                $sess = session();
+                if ($sess) {
+                    $role = (string)($sess->get('user_role') ?? '');
+                    $roles = (array)($sess->get('roles') ?? []);
+                    $isSuper = ($sess->get('is_super_admin') === true)
+                        || strcasecmp($role, 'super_admin') === 0
+                        || in_array('super_admin', $roles, true);
+                }
+            }
+
+            if ($isSuper) {
+                return "<!-- Google Analytics: excluded for Super Administrator session -->\n";
+            }
+        }
+
+        $alreadyRendered = true;
+        $escapedId = esc($measurementId);
+
+        $configOptions = [];
+        if ($cfg->anonymizeIp || !empty($customOptions['anonymize_ip'])) {
+            $configOptions['anonymize_ip'] = true;
+        }
+
+        $html = [];
+        $html[] = '<!-- Google Analytics (gtag.js) -->';
+        $html[] = '<script async src="https://www.googletagmanager.com/gtag/js?id=' . $escapedId . '"></script>';
+        $html[] = '<script>';
+        $html[] = '  window.dataLayer = window.dataLayer || [];';
+        $html[] = '  function gtag(){dataLayer.push(arguments);}';
+        $html[] = "  gtag('js', new Date());";
+        if (!empty($configOptions)) {
+            $html[] = "  gtag('config', '{$escapedId}', " . json_encode($configOptions) . ");";
+        } else {
+            $html[] = "  gtag('config', '{$escapedId}');";
+        }
+        $html[] = '</script>';
+
+        return implode("\n", $html) . "\n";
+    }
+}
+
+if (!function_exists('google_search_console')) {
+    /**
+     * Render Google Search Console verification meta tag
+     *
+     * Configurable in .env via GOOGLE_SITE_VERIFICATION, GOOGLE_SEARCH_CONSOLE_CODE, etc.
+     * and enabled via GOOGLE_SEARCH_CONSOLE_ENABLED (default true).
+     *
+     * Injected across all layouts, views, landing pages, authentication pages,
+     * and demo / super admin dashboard areas.
+     *
+     * @param array $customOptions Optional overrides (token, code, enabled, force, reset)
+     * @return string Rendered HTML meta tag or empty string
+     */
+    function google_search_console(array $customOptions = []): string {
+        static $alreadyRendered = false;
+
+        if (!empty($customOptions['reset'])) {
+            $alreadyRendered = false;
+            return '';
+        }
+
+        $force = (bool)($customOptions['force'] ?? false);
+        if ($alreadyRendered && !$force) {
+            return '';
+        }
+
+        $cfg = seo_config();
+
+        // 1. Verify enabled
+        $isEnabled = isset($customOptions['enabled'])
+            ? (bool)$customOptions['enabled']
+            : (bool)($cfg->googleSearchConsoleEnabled ?? true);
+
+        if (!$isEnabled) {
+            return '';
+        }
+
+        // 2. Resolve verification token
+        $rawToken = null;
+        if (!empty($customOptions['token'])) {
+            $rawToken = $customOptions['token'];
+        } elseif (!empty($customOptions['code'])) {
+            $rawToken = $customOptions['code'];
+        } elseif (!empty($customOptions['verification'])) {
+            $rawToken = $customOptions['verification'];
+        } else {
+            $rawToken = $cfg->googleSiteVerification ?? '';
+        }
+
+        $token = trim((string)$rawToken);
+        if (empty($token)) {
+            return '';
+        }
+
+        // If a full tag was passed, extract content attribute value
+        if (preg_match('/content=[\'"]([^\'"]+)[\'"]/i', $token, $matches)) {
+            $token = trim($matches[1]);
+        }
+        $token = trim($token, " \t\n\r\0\x0B\"'<>");
+
+        if (empty($token)) {
+            return '';
+        }
+
+        $alreadyRendered = true;
+        $escapedToken = esc($token);
+
+        $html = [];
+        $html[] = '<!-- Google Search Console Verification -->';
+        $html[] = '<meta name="google-site-verification" content="' . $escapedToken . '">';
+
+        return implode("\n", $html) . "\n";
+    }
+}
+
+if (!function_exists('google_site_verification')) {
+    /**
+     * Alias for google_search_console()
+     */
+    function google_site_verification(array $customOptions = []): string {
+        return google_search_console($customOptions);
+    }
+}
+
+
 

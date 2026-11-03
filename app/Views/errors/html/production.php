@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="robots" content="noindex">
+    <?= function_exists('google_search_console') ? google_search_console() : '' ?>
 
     <title><?= lang('Errors.whoops') ?></title>
 

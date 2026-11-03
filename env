@@ -67,3 +67,23 @@
 #--------------------------------------------------------------------
 
 # logger.threshold = 4
+
+#--------------------------------------------------------------------
+# GOOGLE ANALYTICS
+#--------------------------------------------------------------------
+# Google Analytics 4 Measurement ID (e.g. G-XXXXXXXXXX)
+# GOOGLE_ANALYTICS_ID = 'G-XXXXXXXXXX'
+# GOOGLE_ANALYTICS_ENABLED = true
+# GOOGLE_ANALYTICS_EXCLUDE_SUPERADMIN = true
+
+#--------------------------------------------------------------------
+# GOOGLE SEARCH CONSOLE
+#--------------------------------------------------------------------
+# Google Site Verification token for Google Search Console ownership.
+# Accepts raw verification token or full meta tag:
+# e.g. '4z8hK_xVnQ3sL7yP2rT1wU9...' or '<meta name="google-site-verification" content="...">'
+# GOOGLE_SITE_VERIFICATION = 'your-google-search-console-verification-code'
+# GOOGLE_SEARCH_CONSOLE_ENABLED = true
+# GOOGLE_SITE_VERIFICATION_FILE = 'google1234567890abcdef.html'
+
+

@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="base-url" content="<?= rtrim(base_url(), '/') ?>">
+
+    <!-- Google Analytics (gtag.js) -->
+    <?= google_analytics() ?>
+    <!-- Google Search Console Verification -->
+    <?= google_search_console() ?>
     <!-- SEO Meta Tags, Canonical & Mobile Tags -->
     <?= seo_meta($seo ?? ['title' => 'Sign In — LenDen Cloud']) ?>
 

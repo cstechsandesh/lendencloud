@@ -51,7 +51,7 @@ class SeoController extends BaseController
 
         $lines = [
             '# ====================================================================',
-            '# LenDen Enterprise ERP - Robots Exclusion Protocol',
+            '# LenDen Cloud ERP - Robots Exclusion Protocol',
             '# ====================================================================',
             '',
             'User-agent: *',
@@ -69,37 +69,43 @@ class SeoController extends BaseController
             'Allow: /manifest.json',
             'Allow: /favicon.ico',
             'Allow: /sitemap.xml',
+            'Allow: /google*.html',
             '',
-            '# Disallow Private Authenticated Financial & ERP Application Workspaces',
-            'Disallow: /dashboard',
-            'Disallow: /dashboard/',
-            'Disallow: /accounts',
-            'Disallow: /accounts/',
+            '# Allow Behind-Logged-In Business Modules (Enabled via Demo Mode)',
+            'Allow: /dashboard',
+            'Allow: /accounts',
+            'Allow: /accounts/',
+            'Allow: /journals',
+            'Allow: /journals/',
+            'Allow: /parties',
+            'Allow: /parties/',
+            'Allow: /inventory',
+            'Allow: /inventory/',
+            'Allow: /sales',
+            'Allow: /sales/',
+            'Allow: /purchases',
+            'Allow: /purchases/',
+            'Allow: /vouchers',
+            'Allow: /vouchers/',
+            'Allow: /reports',
+            'Allow: /reports/',
+            'Allow: /companies',
+            'Allow: /companies/',
+            '',
+            '# Strictly Disallow Super Admin & Sensitive Management Areas ("Except super admin")',
             'Disallow: /admin',
             'Disallow: /admin/',
-            'Disallow: /companies',
-            'Disallow: /companies/',
+            'Disallow: /subscriptions',
+            'Disallow: /subscriptions/',
+            'Disallow: /subscription',
             'Disallow: /users',
             'Disallow: /users/',
             'Disallow: /roles',
             'Disallow: /roles/',
-            'Disallow: /subscriptions',
-            'Disallow: /subscriptions/',
-            'Disallow: /subscription',
-            'Disallow: /payments',
-            'Disallow: /payments/',
-            'Disallow: /inventory',
-            'Disallow: /inventory/',
-            'Disallow: /purchases',
-            'Disallow: /purchases/',
-            'Disallow: /sales',
-            'Disallow: /sales/',
-            'Disallow: /reports',
-            'Disallow: /reports/',
-            'Disallow: /vouchers',
-            'Disallow: /vouchers/',
             'Disallow: /settings',
             'Disallow: /settings/',
+            'Disallow: /payments',
+            'Disallow: /payments/',
             'Disallow: /profile',
             'Disallow: /profile/',
             'Disallow: /ajax/',
@@ -111,6 +117,30 @@ class SeoController extends BaseController
         return $this->response
             ->setContentType('text/plain', 'utf-8')
             ->setBody(implode("\n", $lines));
+    }
+
+    /**
+     * Google Search Console HTML File Verification Handler
+     *
+     * Serves expected verification string: "google-site-verification: google{code}.html"
+     */
+    public function googleVerification(string $filename): ResponseInterface
+    {
+        $cfg = seo_config();
+
+        if (!$cfg->googleSearchConsoleEnabled) {
+            return $this->response->setStatusCode(404)->setBody('Not Found');
+        }
+
+        // If a specific verification file is configured in .env, enforce match
+        $expected = trim($cfg->googleVerificationFile);
+        if (!empty($expected) && strcasecmp($expected, $filename) !== 0) {
+            return $this->response->setStatusCode(404)->setBody('Not Found');
+        }
+
+        return $this->response
+            ->setContentType('text/html', 'utf-8')
+            ->setBody('google-site-verification: ' . htmlspecialchars($filename, ENT_QUOTES, 'UTF-8'));
     }
 }
 

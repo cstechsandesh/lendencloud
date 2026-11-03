@@ -18,36 +18,41 @@ Allow: /manifest.json
 Allow: /favicon.ico
 Allow: /sitemap.xml
 
-# Disallow Private Authenticated Financial & ERP Application Workspaces
-Disallow: /dashboard
-Disallow: /dashboard/
-Disallow: /accounts
-Disallow: /accounts/
+# Allow Behind-Logged-In Business Modules (Enabled via Demo Mode)
+Allow: /dashboard
+Allow: /accounts
+Allow: /accounts/
+Allow: /journals
+Allow: /journals/
+Allow: /parties
+Allow: /parties/
+Allow: /inventory
+Allow: /inventory/
+Allow: /sales
+Allow: /sales/
+Allow: /purchases
+Allow: /purchases/
+Allow: /vouchers
+Allow: /vouchers/
+Allow: /reports
+Allow: /reports/
+Allow: /companies
+Allow: /companies/
+
+# Strictly Disallow Super Admin & Sensitive Management Areas ("Except super admin")
 Disallow: /admin
 Disallow: /admin/
-Disallow: /companies
-Disallow: /companies/
+Disallow: /subscriptions
+Disallow: /subscriptions/
+Disallow: /subscription
 Disallow: /users
 Disallow: /users/
 Disallow: /roles
 Disallow: /roles/
-Disallow: /subscriptions
-Disallow: /subscriptions/
-Disallow: /subscription
-Disallow: /payments
-Disallow: /payments/
-Disallow: /inventory
-Disallow: /inventory/
-Disallow: /purchases
-Disallow: /purchases/
-Disallow: /sales
-Disallow: /sales/
-Disallow: /reports
-Disallow: /reports/
-Disallow: /vouchers
-Disallow: /vouchers/
 Disallow: /settings
 Disallow: /settings/
+Disallow: /payments
+Disallow: /payments/
 Disallow: /profile
 Disallow: /profile/
 Disallow: /ajax/
