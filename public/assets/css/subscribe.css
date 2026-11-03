@@ -1,0 +1,50 @@
+/**
+ * LenDen Enterprise - Subscription Registration Styles
+ */
+
+body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%);
+    min-height: 100vh;
+    padding: 2.5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.subscribe-container {
+    width: 100%;
+    max-width: 960px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+}
+
+.plan-select-card {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    background: #fff;
+}
+
+.plan-select-card:hover {
+    border-color: #6366f1;
+    transform: translateY(-2px);
+}
+
+.plan-select-card.selected {
+    border-color: #4f46e5;
+    background: #f5f3ff;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+}
+
+.cycle-toggle-btn {
+    border-radius: 30px;
+    padding: 0.35rem 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+

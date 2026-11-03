@@ -1,0 +1,22 @@
+{
+  "name": "LenDen Cloud ERP",
+  "short_name": "LenDen Cloud",
+  "description": "Double-entry accounting, GST invoicing, and multi-company cloud ERP suite.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0b1120",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "assets/images/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

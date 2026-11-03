@@ -1,0 +1,21 @@
+body {
+    font-size: 13px;
+    color: #1e293b;
+    background: #ffffff;
+}
+
+.invoice-box {
+    max-width: 800px;
+    margin: auto;
+    padding: 30px;
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    body {
+        padding: 0;
+    }
+}
+
