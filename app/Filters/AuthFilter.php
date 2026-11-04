@@ -21,6 +21,7 @@ class AuthFilter implements FilterInterface
         'payments',
         'admin',
         'profile',
+        'migrations',
     ];
 
     public function before(RequestInterface $request, $arguments = null)

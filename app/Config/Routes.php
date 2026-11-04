@@ -101,6 +101,21 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('admin/roles', 'Admin\RoleController::index', ['filter' => 'permission:roles.view']);
 
     // ----------------------------------------------------------------
+    // Database Migrations & Schema Runner (Super Admin)
+    // ----------------------------------------------------------------
+    $routes->group('migrations', function ($routes) {
+        $routes->get('/', 'Migrations::index');
+        $routes->post('run', 'Migrations::runPending');
+        $routes->post('rollback', 'Migrations::rollback');
+        $routes->post('refresh', 'Migrations::refresh');
+        $routes->post('seed', 'Migrations::seed');
+        $routes->post('refresh-seed', 'Migrations::refreshAndSeed');
+        $routes->get('view/(:segment)', 'Migrations::viewCode/$1');
+        $routes->get('view', 'Migrations::viewCode');
+    });
+    $routes->get('migrations', 'Migrations::index');
+
+    // ----------------------------------------------------------------
     // Chart of Accounts
     // ----------------------------------------------------------------
     $routes->group('accounts', ['filter' => 'permission:accounts.view'], function ($routes) {

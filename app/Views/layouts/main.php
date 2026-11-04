@@ -16,7 +16,7 @@ if (empty($seg1) || in_array($seg1, ['lenden', 'public'])) {
 $seg2 = strtolower($uriParts[1] ?? '');
 
 // Super Admin & Sensitive management areas strictly excluded from SEO indexing and demo auto-login
-$isSuperAdminArea = in_array($seg1, ['subscriptions', 'subscription', 'users', 'roles', 'settings', 'payments', 'profile'], true)
+$isSuperAdminArea = in_array($seg1, ['subscriptions', 'subscription', 'users', 'roles', 'settings', 'payments', 'profile', 'migrations'], true)
     || ($seg1 === 'admin' && in_array($seg2, ['users', 'roles', 'subscriptions'], true));
 ?>
 <!DOCTYPE html>
@@ -315,6 +315,10 @@ $isSuperAdminArea = in_array($seg1, ['subscriptions', 'subscription', 'users', '
                 <a href="<?= base_url('roles') ?>" class="nav-link <?= ($seg1 === 'roles') ? 'active' : '' ?>">
                     <i class="bi bi-shield-lock-fill"></i>
                     <span>Roles & Permissions</span>
+                </a>
+                <a href="<?= base_url('migrations') ?>" class="nav-link <?= ($seg1 === 'migrations') ? 'active' : '' ?>">
+                    <i class="bi bi-database-fill-gear"></i>
+                    <span>Database Migrations</span>
                 </a>
             <?php endif; ?>
         <?php endif; ?>

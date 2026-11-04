@@ -27,6 +27,13 @@ abstract class BaseController extends CSController
     protected $session;
 
     /**
+     * Database connection instance
+     *
+     * @var \CodeIgniter\Database\BaseConnection
+     */
+    protected $db;
+
+    /**
      * Active company context
      */
     protected int $companyId = 1;
@@ -36,6 +43,7 @@ abstract class BaseController extends CSController
     {
         parent::initController($request, $response, $logger);
         $this->session = service('session');
+        $this->db      = \Config\Database::connect();
 
         // Resolve active company from session or default multi-company context
         $this->companyId = (int)($this->session->get('company_id') ?? 1);
