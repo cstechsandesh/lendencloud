@@ -132,8 +132,9 @@ foreach ($transactions as $tx) {
         </div>
     </div>
     <div class="card-body p-4">
-            <table class="table table-hover align-middle mb-0 datatable">
-                <thead>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
                     <tr>
                         <th style="width: 120px;">Date</th>
                         <th>Reference #</th>
@@ -178,6 +179,7 @@ foreach ($transactions as $tx) {
                     </tr>
                 </tfoot>
             </table>
+        </div>
     </div>
 </div>
 <?= $this->endSection() ?>
