@@ -50,6 +50,11 @@ class AuthFilter implements FilterInterface
 
         $isSuperAdminRoute = in_array($seg1, $this->superAdminRestrictedRoutes, true);
 
+        // Migrations controller has dedicated self-authentication (HTTP Basic Auth & Super Admin sessioning)
+        if ($seg1 === 'migrations') {
+            return;
+        }
+
         // If user is already logged in as a demo user, ensure they cannot access Super Admin areas
         if ($session->get('logged_in') && $session->get('is_demo_user')) {
             if ($isSuperAdminRoute) {

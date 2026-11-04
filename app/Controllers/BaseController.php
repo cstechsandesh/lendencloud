@@ -208,23 +208,42 @@ abstract class BaseController extends CSController
         $isSuperAdmin = in_array('super_admin', $roles, true);
 
         // Fetch companies accessible by current user for switcher
-        $companyModel = new CompanyModel();
-        $allCompanies = $companyModel->getUserCompanies($userId, $isSuperAdmin);
+        $allCompanies = [];
+        try {
+            $companyModel = new CompanyModel();
+            $allCompanies = $companyModel->getUserCompanies($userId, $isSuperAdmin);
+        } catch (\Throwable $e) {
+            $allCompanies = [];
+        }
 
         $hasCompanySwitcher = count($allCompanies) > 1 || $isSuperAdmin;
 
         // Fetch active company subscription & plan feature flags
-        $subModel = new SubscriptionModel();
-        $currentSub = $subModel->getCompanySubscription($this->companyId);
-        $currentPlanCode = $currentSub['plan_code'] ?? 'starter_business';
-
+        $currentSub = null;
+        $currentPlanCode = 'starter_business';
         $planFeatures = [
-            'sales'            => $isSuperAdmin || SubscriptionPlanModel::planAllowsFeature($currentSub ?: $currentPlanCode, 'sales'),
-            'purchases'        => $isSuperAdmin || SubscriptionPlanModel::planAllowsFeature($currentSub ?: $currentPlanCode, 'purchases'),
-            'inventory'        => $isSuperAdmin || SubscriptionPlanModel::planAllowsFeature($currentSub ?: $currentPlanCode, 'inventory'),
-            'advanced_reports' => $isSuperAdmin || SubscriptionPlanModel::planAllowsFeature($currentSub ?: $currentPlanCode, 'advanced_reports'),
-            'multi_company'    => $isSuperAdmin || SubscriptionPlanModel::planAllowsFeature($currentSub ?: $currentPlanCode, 'multi_company'),
+            'sales'            => true,
+            'purchases'        => true,
+            'inventory'        => true,
+            'advanced_reports' => true,
+            'multi_company'    => true,
         ];
+
+        try {
+            $subModel = new SubscriptionModel();
+            $currentSub = $subModel->getCompanySubscription($this->companyId);
+            $currentPlanCode = $currentSub['plan_code'] ?? 'starter_business';
+
+            $planFeatures = [
+                'sales'            => $isSuperAdmin || SubscriptionPlanModel::planAllowsFeature($currentSub ?: $currentPlanCode, 'sales'),
+                'purchases'        => $isSuperAdmin || SubscriptionPlanModel::planAllowsFeature($currentSub ?: $currentPlanCode, 'purchases'),
+                'inventory'        => $isSuperAdmin || SubscriptionPlanModel::planAllowsFeature($currentSub ?: $currentPlanCode, 'inventory'),
+                'advanced_reports' => $isSuperAdmin || SubscriptionPlanModel::planAllowsFeature($currentSub ?: $currentPlanCode, 'advanced_reports'),
+                'multi_company'    => $isSuperAdmin || SubscriptionPlanModel::planAllowsFeature($currentSub ?: $currentPlanCode, 'multi_company'),
+            ];
+        } catch (\Throwable $e) {
+            // Keep default feature flags if database tables are not migrated yet
+        }
 
         $isDemoUser = (bool)($this->session->get('is_demo_user') ?? false);
 

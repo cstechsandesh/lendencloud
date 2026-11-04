@@ -18,6 +18,7 @@ class DemoFilter implements FilterInterface
         'subscribe',
         'companies/switch',
         'test/demo-restriction',
+        'migrations',
     ];
 
     /**
