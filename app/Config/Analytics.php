@@ -27,6 +27,22 @@ class Analytics extends BaseConfig
      */
     public bool $anonymizeIp = false;
 
+    /**
+     * Cookie domain for Google Analytics cookies.
+     * Options:
+     * - 'none': Host-only cookie bound strictly to the current hostname (e.g. lenden.cstech.ind.in).
+     *           Recommended for subdomains and multi-level TLDs (.ind.in, .co.uk) to prevent browser
+     *           rejection ("Cookie has been rejected for invalid domain").
+     * - 'auto': Default gtag behavior (probes parent domains, can trigger PSL warnings on .ind.in).
+     * - Root domain (e.g. 'cstech.ind.in') for multi-subdomain tracking across *.cstech.ind.in.
+     */
+    public string $cookieDomain = 'none';
+
+    /**
+     * Additional cookie flags for Google Analytics cookies (e.g. 'SameSite=Lax;Secure' or 'SameSite=None;Secure').
+     */
+    public string $cookieFlags = 'SameSite=Lax;Secure';
+
     public function __construct()
     {
         parent::__construct();
@@ -53,6 +69,18 @@ class Analytics extends BaseConfig
         $envAnonymize = env('GOOGLE_ANALYTICS_ANONYMIZE_IP', env('google.analytics.anonymizeIp', env('analytics.anonymizeIp', null)));
         if ($envAnonymize !== null) {
             $this->anonymizeIp = filter_var($envAnonymize, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        // 5. Cookie Domain
+        $envCookieDomain = env('GOOGLE_ANALYTICS_COOKIE_DOMAIN', env('google.analytics.cookieDomain', env('analytics.cookieDomain', null)));
+        if ($envCookieDomain !== null) {
+            $this->cookieDomain = trim((string)$envCookieDomain);
+        }
+
+        // 6. Cookie Flags
+        $envCookieFlags = env('GOOGLE_ANALYTICS_COOKIE_FLAGS', env('google.analytics.cookieFlags', env('analytics.cookieFlags', null)));
+        if ($envCookieFlags !== null) {
+            $this->cookieFlags = trim((string)$envCookieFlags);
         }
     }
 }

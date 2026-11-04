@@ -75,6 +75,8 @@
 # GOOGLE_ANALYTICS_ID = 'G-XXXXXXXXXX'
 # GOOGLE_ANALYTICS_ENABLED = true
 # GOOGLE_ANALYTICS_EXCLUDE_SUPERADMIN = true
+# GOOGLE_ANALYTICS_COOKIE_DOMAIN = 'none'
+# GOOGLE_ANALYTICS_COOKIE_FLAGS = 'SameSite=Lax;Secure'
 
 #--------------------------------------------------------------------
 # GOOGLE SEARCH CONSOLE

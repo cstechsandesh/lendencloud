@@ -498,6 +498,20 @@ if (!function_exists('google_analytics')) {
             $configOptions['anonymize_ip'] = true;
         }
 
+        $cookieDomain = isset($customOptions['cookie_domain'])
+            ? trim((string)$customOptions['cookie_domain'])
+            : trim((string)($cfg->cookieDomain ?? ''));
+        if ($cookieDomain !== '') {
+            $configOptions['cookie_domain'] = $cookieDomain;
+        }
+
+        $cookieFlags = isset($customOptions['cookie_flags'])
+            ? trim((string)$customOptions['cookie_flags'])
+            : trim((string)($cfg->cookieFlags ?? ''));
+        if ($cookieFlags !== '') {
+            $configOptions['cookie_flags'] = $cookieFlags;
+        }
+
         $html = [];
         $html[] = '<!-- Google Analytics (gtag.js) -->';
         $html[] = '<script async src="https://www.googletagmanager.com/gtag/js?id=' . $escapedId . '"></script>';

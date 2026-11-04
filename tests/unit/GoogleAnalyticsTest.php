@@ -36,6 +36,9 @@ assertTest(property_exists($analyticsConfig, 'googleAnalyticsId'), 'googleAnalyt
 assertTest(property_exists($analyticsConfig, 'enabled'), 'enabled property exists');
 assertTest(property_exists($analyticsConfig, 'excludeSuperAdmin'), 'excludeSuperAdmin property exists');
 assertTest($analyticsConfig->excludeSuperAdmin === true, 'excludeSuperAdmin defaults to true');
+assertTest(property_exists($analyticsConfig, 'cookieDomain'), 'cookieDomain property exists');
+assertTest(property_exists($analyticsConfig, 'cookieFlags'), 'cookieFlags property exists');
+assertTest($analyticsConfig->cookieDomain === 'none', 'cookieDomain defaults to "none" for host-only cookies');
 assertTest(is_string($analyticsConfig->googleAnalyticsId), 'googleAnalyticsId is a string loaded from environment');
 
 // -------------------------------------------------------------------------
@@ -126,7 +129,14 @@ google_analytics(['reset' => true]);
 $_SESSION = [];
 $output = google_analytics(['id' => $testMeasurementId, 'force' => true]);
 assertTest(str_contains($output, 'googletagmanager.com/gtag/js?id=G-TEST999999'), 'Guest receives GA gtag.js library script');
-assertTest(str_contains($output, "gtag('config', 'G-TEST999999')"), 'Guest receives gtag config initialization');
+assertTest(str_contains($output, "gtag('config', 'G-TEST999999'"), 'Guest receives gtag config initialization');
+assertTest(str_contains($output, '"cookie_domain":"none"'), 'Guest gtag config includes cookie_domain: none to prevent invalid domain rejection');
+assertTest(str_contains($output, '"cookie_flags":"SameSite=Lax;Secure"'), 'Guest gtag config includes secure cookie_flags');
+
+// 3b-2. Custom cookie domain override
+google_analytics(['reset' => true]);
+$outputCustomDomain = google_analytics(['id' => $testMeasurementId, 'cookie_domain' => 'cstech.ind.in', 'force' => true]);
+assertTest(str_contains($outputCustomDomain, '"cookie_domain":"cstech.ind.in"'), 'Custom cookie_domain override is reflected in config');
 
 // 3c. Regular tenant user with ID
 google_analytics(['reset' => true]);
